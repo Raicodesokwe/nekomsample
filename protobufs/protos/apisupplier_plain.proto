@@ -1,0 +1,169 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.nekom.backend.grpc.supplier";
+option java_outer_classname = "ApiSupplierConnect";
+option go_package = "/proto";
+
+
+// Microservice Suppliers provides endpoints for managing supplier data (table 'supplier'), including the address.
+service Suppliers {
+  // Creates a new supplier, with a new address set as main address.
+  // Returns the new supplier.
+  rpc addSupplier(AddSupplierRequest) returns (SupplierResponse) {
+  }
+  // Updates an existing supplier and their address for given uuid.
+  // Returns the updated supplier.
+  rpc updateSupplier(UpdateSupplierRequest) returns (SupplierResponse) {
+  }
+  // Deletes an existing supplier and their address for given uuid.
+  rpc deleteSupplier(SupplierUuidRequest) returns (SuppliersMetaResponse) {
+  }
+  // Retrieves an existing supplier for given uuid.
+  rpc getSupplier(SupplierUuidRequest) returns (SupplierResponse) {
+  }
+
+
+
+  // Calculates purchase price for given supplier uuid (and optionally item uuid) based on list price.
+  rpc calculatePurchasePrice(CalculatePurchasePriceRequest) returns (CalculatePurchasePriceResponse) {
+  }
+
+  // Retrieves a list of supplier for this client
+  rpc getAllSupplier(SupplierEmptyRequest) returns (SupplierListResponse) {
+  }
+}
+
+message SupplierEmptyRequest{
+}
+
+message SupplierListResponse {
+  SuppliersMetaResponse metaResponse = 1;
+  repeated Supplier supplier = 2;
+}
+
+
+enum Supplyment {
+  CENTRAL = 0;
+  CROSS_DOCKING = 1;
+}
+
+// Wrapper for common response data. Included in all responses.
+message SuppliersMetaResponse {
+  bool success = 1;
+  string errorMessage = 2;
+  string errorType = 3;
+}
+
+message AddSupplierRequest {
+  string supplierId = 1;
+  string name1 = 2; // MANDATORY
+  string name2 = 3;
+  string email = 4;
+  bool internalSupplier = 5;
+  Supplyment supplyment = 6;
+  int64 shippingTime = 7;
+  SupplierAddress address = 8; // MANDATORY
+}
+
+message UpdateSupplierRequest {
+  string uuid = 1;
+  string supplierId = 2;
+  string name1 = 3;
+  string name2 = 4;
+  string email = 5;
+  bool internalSupplier = 6;
+  Supplyment supplyment = 7;
+  int64 shippingTime = 8;
+  SupplierAddress address = 9;
+}
+
+message SupplierUuidRequest {
+  string uuid = 1; // MANDATORY
+}
+
+message CalculatePurchasePriceRequest {
+  string supplieruuid = 1; // MANDATORY
+  string itemuuid = 2;
+  bool allsupplier = 3;
+}
+
+// In request, all fields are mandatory.
+message SupplierAddress {
+  string firstName = 1;
+  string lastName = 2;
+  string street = 3;
+  string houseNumber = 4;
+  string street2 = 5;
+  string zip = 6;
+  string city = 7;
+  string countryISO3 = 9;
+}
+
+message Supplier {
+  string uuid = 1;
+  string supplierId = 2;
+  string name1 = 3; // MANDATORY in PUT/update request
+  string name2 = 4;
+  string email = 5;
+  bool internalSupplier = 6;
+  Supplyment supplyment = 7;
+  int64 shippingTime = 8;
+  SupplierAddress address = 9; // MANDATORY in PUT/update request
+}
+
+message SupplierResponse {
+  SuppliersMetaResponse metaResponse = 1;
+  Supplier supplier = 2;
+}
+
+message CalculatePurchasePriceResponse {
+  SuppliersMetaResponse metaResponse = 1;
+  int64 itemsread = 2;
+  int64 itemschanged = 3;
+  repeated string errorLines = 4;
+}
+
+/* SUPPLIER SIZE/COLOR MAPPING */
+
+service SupplierMappings {
+  // Creates a new supplier mapping for given supplier UUID and variant value UUID.
+  // Returns the created size code mapping.
+  rpc insertSupplierMapping(SupplierMappingRequest) returns (SupplierMappingResponse) {}
+  // Updates an existing supplier mapping for given mapping UUID, supplier UUID and variant value UUID.
+  // Returns the updated mapping.
+  rpc updateSupplierMapping(SupplierMapping) returns (SupplierMappingResponse) {}
+  // Deletes an existing supplier mapping for given mapping UUID.
+  rpc deleteSupplierMapping(SupplierMappingUuidRequest) returns (SuppliersMetaResponse) {}
+  // Retrieves an existing supplier mapping for given mapping UUID.
+  rpc getSupplierMapping(SupplierMappingUuidRequest) returns (SupplierMappingResponse) {}
+  // Retrieves a list of supplier mappings for given supplier UUID.
+  rpc listSupplierMappings(SupplierUuidRequest) returns (SupplierMappingListResponse) {}
+}
+
+message SupplierMappingUuidRequest {
+  string uuid = 1;
+}
+
+message SupplierMapping {
+  string uuid = 1;
+  string supplierUuid = 2;
+  string value = 3;
+  string variantUuid = 4;
+}
+
+message SupplierMappingRequest {
+  string supplierUuid = 1;
+  string value = 2;
+  string variantUuid = 3;
+}
+
+message SupplierMappingResponse {
+  SuppliersMetaResponse metaResponse = 1;
+  SupplierMapping mapping = 2;
+}
+
+message SupplierMappingListResponse {
+  SuppliersMetaResponse metaResponse = 1;
+  repeated SupplierMapping mappings = 2;
+}
