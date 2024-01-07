@@ -564,7 +564,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                                       .push(MaterialPageRoute(
                                                                           builder: (context) => UpdateSupplierOne(
                                                                                 supplierItem: suppList[index],
-                                                                              )));
+                                                                              )))
+                                                                      .then((value) {
+                                                                    setState(
+                                                                        () {
+                                                                      supplierList = StubClass()
+                                                                          .getStub()
+                                                                          .getAllSupplier(
+                                                                              pr.SupplierEmptyRequest());
+                                                                    });
+                                                                  });
                                                                 },
                                                                 icon:
                                                                     Icons.edit,
